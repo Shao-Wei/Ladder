@@ -20149,9 +20149,9 @@ usage:
 int Abc_CommandDsdFilter( Abc_Frame_t * pAbc, int argc, char ** argv )
 {
     If_DsdMan_t * pDsd = (If_DsdMan_t *)Abc_FrameReadManDsd();
-    int c, nLimit = 0, nLutSize = -1, fCleanOccur = 0, fCleanMarks = 0, fInvMarks = 0, fUnate = 0, fThresh = 0, fThreshHeuristic = 0, fVerbose = 0;
+    int c, nLimit = 0, nLutSize = -1, fCleanOccur = 0, fCleanMarks = 0, fInvMarks = 0, fUnate = 0, fThresh = 0, fThreshHeuristic = 0, fLadder = 0, fVerbose = 0;
     Extra_UtilGetoptReset();
-    while ( ( c = Extra_UtilGetopt( argc, argv, "LKomiutsvh" ) ) != EOF )
+    while ( ( c = Extra_UtilGetopt( argc, argv, "LKomiutslvh" ) ) != EOF )
     {
         switch ( c )
         {
@@ -20191,6 +20191,9 @@ int Abc_CommandDsdFilter( Abc_Frame_t * pAbc, int argc, char ** argv )
         case 's':
             fThreshHeuristic ^= 1;
             break;
+        case 'l':
+            fLadder ^= 1;
+            break;
         case 'v':
             fVerbose ^= 1;
             break;
@@ -20215,6 +20218,8 @@ int Abc_CommandDsdFilter( Abc_Frame_t * pAbc, int argc, char ** argv )
         If_DsdManCleanMarks( pDsd, fVerbose );
     if ( fInvMarks )
         If_DsdManInvertMarks( pDsd, fVerbose );
+    if( fLadder )
+        If_DsdManTuneLadder( pDsd, fVerbose );
 #ifdef ABC_USE_CUDD
     else if ( nLimit == 0 )
         Id_DsdManTuneThresh( pDsd, fUnate, fThresh, fThreshHeuristic, fVerbose );
@@ -20232,6 +20237,7 @@ usage:
     Abc_Print( -2, "\t-u     : toggles marking unate functions [default = %s]\n",                   fUnate? "yes": "no" );
     Abc_Print( -2, "\t-t     : toggles marking threshold functions [default = %s]\n",               fThresh? "yes": "no" );
     Abc_Print( -2, "\t-s     : toggles marking threshold functions heuristically [default = %s]\n", fThreshHeuristic?"yes":"no");
+    Abc_Print( -2, "\t-l     : toggles marking ladder functions [default = %s]\n",                  fLadder? "yes": "no" );
     Abc_Print( -2, "\t-v     : toggles verbose output [default = %s]\n",                            fVerbose? "yes": "no" );
     Abc_Print( -2, "\t-h     : print the command usage\n");
     Abc_Print( -2, "\t        \n" );
@@ -20240,6 +20246,7 @@ usage:
     Abc_Print( -2, "\t         A. Neutzling, J. M. Matos, A. Mishchenko, R. Ribas, and A. Reis,\n" );
     Abc_Print( -2, "\t         \"Threshold logic synthesis based on cut pruning\". Proc. ICCAD 2015.\n" );
 //    Abc_Print( -2, "\t        http://www.eecs.berkeley.edu/~alanmi/publications/2015/iccad15_thresh.pdf\n" );
+    Abc_Print( -2, "\t         Option \"dsd_filter -l\" was contributed by Shao-Wei Chu from Texas A&M University.\n" );
     return 1;
 }
 

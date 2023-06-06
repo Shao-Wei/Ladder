@@ -2829,6 +2829,22 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 
 #endif // ABC_USE_CUDD are used
 
+/**Function*************************************************************
+
+  Synopsis    []
+
+  Description []
+               
+  SideEffects []
+
+  SeeAlso     []
+
+***********************************************************************/
+void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
+    printf("Filter cuts which are ladder functions.\n");
+    return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 ///                       END OF FILE                                ///
 ////////////////////////////////////////////////////////////////////////
