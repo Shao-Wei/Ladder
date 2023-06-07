@@ -2844,8 +2844,8 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
     printf("Filter cuts which are ladder functions.\n");
     int fVeryVerbose = 1;
     int fVeryVeryVerbose = 0;
-    int nVarsMax = 8; // LUT size limit
-    int cubeMax = 100; // ladder size limit 
+    const int nVarsMax = 8; // LUT size limit
+    const int cubeMax = 100; // ladder size limit 
 
     ProgressBar * pProgress = NULL;
     If_DsdObj_t * pObj;
