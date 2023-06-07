@@ -2842,16 +2842,15 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 ***********************************************************************/
 void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
     printf("Filter cuts which are ladder functions.\n");
-    int fVeryVerbose = 1;
-    int fVeryVeryVerbose = 0;
+    const int fVeryVerbose = 1;
+    const int fVeryVeryVerbose = 0;
     const int nVarsMax = 8; // LUT size limit
-    const int cubeMax = 100; // ladder size limit 
 
     ProgressBar * pProgress = NULL;
     If_DsdObj_t * pObj;
     word * pTruth, pRes[4]; // pRes[4] supports up to 8 vars
     int i, nVars, Value;
-    int lit, vLit, c, v, vCount = 0, vCountMax, nCubes = 0, pCover[100], lCover[cubeMax][nVarsMax]; // isop
+    int lit, vLit, c, v, vCount = 0, vCountMax, nCubes = 0, pCover[100], lCover[100][8]; // isop
     abctime clk = Abc_Clock();
     if ( p->nObjsPrev > 0 )
         printf( "Starting the tuning process from object %d (out of %d).\n", p->nObjsPrev, Vec_PtrSize(&p->vObjs) );
@@ -2882,7 +2881,7 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
             nCubes = 0;
             Abc_Tt8IsopCover( pTruth, pTruth, nVars, pRes, pCover, &nCubes );
             // interpret pCover
-            for ( c=0; c<cubeMax; c++ )
+            for ( c=0; c<nCubes; c++ )
                 for ( v=0; v<nVarsMax; v++ ) 
                     lCover[c][v] = -1;
             for ( c=0; c<nCubes; c++ ) {
@@ -2901,7 +2900,7 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
             if(fVeryVeryVerbose) {
                 printf(" nCube = %i\n", nCubes);
                 if( nCubes <= 4) {
-                    for ( c=0; c<4; c++ ) {
+                    for ( c=0; c<nCubes; c++ ) {
                         printf("       ");
                         for ( v=0; v<nVarsMax; v++ ) {
                             if( lCover[c][v] == -1) 
