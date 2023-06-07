@@ -2842,6 +2842,85 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 ***********************************************************************/
 void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
     printf("Filter cuts which are ladder functions.\n");
+    int fVeryVerbose = 1;
+    int fVeryVeryVerbose = 0;
+    int nVarsMax = 8; // LUT size limit
+    int cubeMax = 100; // ladder size limit 
+
+    ProgressBar * pProgress = NULL;
+    If_DsdObj_t * pObj;
+    word * pTruth, pRes[4]; // pRes[4] supports up to 8 vars
+    int i, nVars, Value;
+    int lit, vLit, c, v, vCount = 0, vCountMax, nCubes = 0, pCover[100], lCover[cubeMax][nVarsMax]; // isop
+    abctime clk = Abc_Clock();
+    if ( p->nObjsPrev > 0 )
+        printf( "Starting the tuning process from object %d (out of %d).\n", p->nObjsPrev, Vec_PtrSize(&p->vObjs) );
+    // clean the attributes
+    If_DsdVecForEachObj( &p->vObjs, pObj, i )
+        if ( i >= p->nObjsPrev )
+            pObj->fMark = 0;
+    if ( p->vConfigs == NULL )
+        p->vConfigs = Vec_WrdStart( Vec_PtrSize(&p->vObjs) );
+    else
+        Vec_WrdFillExtra( p->vConfigs, Vec_PtrSize(&p->vObjs), 0 );
+    pProgress = Extra_ProgressBarStart( stdout, Vec_PtrSize(&p->vObjs) );
+    // iterate all cuts
+    If_DsdVecForEachObjStart( &p->vObjs, pObj, i, p->nObjsPrev ) {
+        if ( (i & 0xFF) == 0 )
+            Extra_ProgressBarUpdate( pProgress, i, NULL );
+        nVars = If_DsdObjSuppSize(pObj);
+        if ( nVars > nVarsMax )
+            continue;
+        // derive TT
+        pTruth = If_DsdManComputeTruth( p, Abc_Var2Lit(i, 0), NULL );
+        if ( fVeryVeryVerbose )
+            printf( "%6d: nVars = %d,", i, nVars );
+        Value = 1; 
+        // Value = Abc_TtIsUnate( pTruth, nVars );
+        // derive ISOP
+        if ( Value ) {
+            nCubes = 0;
+            Abc_Tt8IsopCover( pTruth, pTruth, nVars, pRes, pCover, &nCubes );
+            // interpret pCover
+            for ( c=0; c<cubeMax; c++ )
+                for ( v=0; v<nVarsMax; v++ ) 
+                    lCover[c][v] = -1;
+            for ( c=0; c<nCubes; c++ ) {
+                vCount = 0;
+                for ( v=0; v<nVars; v++ ) {
+                    vLit = (pCover[c] >> (2*v)) & 3;
+                    if ( vLit == 1 || vLit == 2 ) {
+                        lit = Abc_Var2Lit(v, vLit != 1);
+                        lCover[c][vCount] = lit;
+                        vCount++;
+                    }   
+                }
+                if(vCount > vCountMax)
+                    vCountMax = vCount;
+            }
+            if(fVeryVeryVerbose) {
+                printf(" nCube = %i\n", nCubes);
+                if( nCubes <= 4) {
+                    for ( c=0; c<4; c++ ) {
+                        printf("       ");
+                        for ( v=0; v<nVarsMax; v++ ) {
+                            if( lCover[c][v] == -1) 
+                                printf(".. ");
+                            else
+                                printf("%s%i ", (Abc_LitIsCompl(lCover[c][v]))? "-": " ", Abc_Lit2Var(lCover[c][v]));
+                        }  
+                        printf("\n");
+                    }  
+                }   
+            }
+        }
+        if ( Value )
+            If_DsdVecObjSetMark( &p->vObjs, i );
+    }
+    Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
+    if ( fVeryVerbose )
+        If_DsdManPrintDistrib( p );
+
     return;
 }
 
