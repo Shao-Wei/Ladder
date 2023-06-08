@@ -25,6 +25,7 @@
 #include "sat/bsat/satSolver.h"
 #include "aig/gia/gia.h"
 #include "bool/kit/kit.h"
+#include "extLadder/ladder.h"
 
 #ifdef ABC_USE_CUDD
 #include "bdd/extrab/extraBdd.h"
@@ -2841,7 +2842,6 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 
 ***********************************************************************/
 void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
-    printf("Filter cuts which are ladder functions.\n");
     const int fVeryVerbose = 1;
     const int fVeryVeryVerbose = 0;
     const int nVarsMax = 8; // LUT size limit
@@ -2851,6 +2851,7 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
     word * pTruth, pRes[4]; // pRes[4] supports up to 8 vars
     int i, nVars, Value;
     int lit, vLit, c, v, vCount = 0, vCountMax, nCubes = 0, pCover[100], lCover[100][8]; // isop
+    LadderSize_t * ls = ladderSizeStart();
     abctime clk = Abc_Clock();
     if ( p->nObjsPrev > 0 )
         printf( "Starting the tuning process from object %d (out of %d).\n", p->nObjsPrev, Vec_PtrSize(&p->vObjs) );
@@ -2897,6 +2898,7 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
                 if(vCount > vCountMax)
                     vCountMax = vCount;
             }
+            ladderSizeInc(ls, nCubes, vCount);
             if(fVeryVeryVerbose) {
                 printf(" nCube = %i\n", nCubes);
                 if( nCubes <= 4) {
@@ -2916,9 +2918,15 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
         if ( Value )
             If_DsdVecObjSetMark( &p->vObjs, i );
     }
+    p->nObjsPrev = 0;
+    p->LutSize = 0;
+    Extra_ProgressBarStop( pProgress );
+    printf( "Finished matching %d functions. ", Vec_PtrSize(&p->vObjs) );
     Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
     if ( fVeryVerbose )
         If_DsdManPrintDistrib( p );
+    ladderSizePrint(ls, Vec_PtrSize(&p->vObjs));
+    ladderSizeStop(ls);
 
     return;
 }
