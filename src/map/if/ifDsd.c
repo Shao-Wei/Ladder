@@ -2842,6 +2842,11 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 
 ***********************************************************************/
 void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
+    extern LadderSize_t * ladderSizeStart();
+    extern void ladderSizeStop(LadderSize_t * ls);
+    extern void ladderSizeInc(LadderSize_t * ls, int cubeSize, int litSize);
+    extern void ladderSizePrint(LadderSize_t * ls, int objSize, int fVeryVerbose);
+
     const int fVeryVerbose = 0;
     const int fVeryVeryVerbose = 0;
     const int nVarsMax = 8; // LUT size limit
