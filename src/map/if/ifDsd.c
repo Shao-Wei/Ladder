@@ -2842,7 +2842,7 @@ void Id_DsdManTuneThresh( If_DsdMan_t * p, int fUnate, int fThresh, int fThreshH
 
 ***********************************************************************/
 void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
-    const int fVeryVerbose = 1;
+    const int fVeryVerbose = 0;
     const int fVeryVeryVerbose = 0;
     const int nVarsMax = 8; // LUT size limit
 
@@ -2898,6 +2898,18 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
                 if(vCount > vCountMax)
                     vCountMax = vCount;
             }
+            /** // check repeated inputs
+            int fRepeat = 0, var[8] = { 0 };
+            for( c=0; c<nCubes; c++ ) {
+                for( v=0; v<vCountMax; v++ ) {
+                    if( lCover[c][v] >= 0 ) {
+                        if( var[Abc_Lit2Var(lCover[c][v])] ) { fRepeat = 1; break; }
+                        else { var[Abc_Lit2Var(lCover[c][v])] = 1; }
+                    }
+                }   
+            }     
+            if(!fRepeat)
+            **/
             ladderSizeInc(ls, nCubes, vCount);
             if(fVeryVeryVerbose) {
                 printf(" nCube = %i\n", nCubes);
@@ -2925,7 +2937,7 @@ void If_DsdManTuneLadder( If_DsdMan_t * p, int fVerbose ) {
     Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
     if ( fVeryVerbose )
         If_DsdManPrintDistrib( p );
-    ladderSizePrint(ls, Vec_PtrSize(&p->vObjs));
+    ladderSizePrint(ls, Vec_PtrSize(&p->vObjs), fVeryVerbose);
     ladderSizeStop(ls);
 
     return;

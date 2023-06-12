@@ -14,7 +14,7 @@ struct LadderSize_ {
 extern LadderSize_t * ladderSizeStart();
 extern void ladderSizeStop(LadderSize_t * ls);
 extern void ladderSizeInc(LadderSize_t * ls, int cubeSize, int litSize);
-extern void ladderSizePrint(LadderSize_t * ls, int objSize);
+extern void ladderSizePrint(LadderSize_t * ls, int objSize, int fVeryVerbose);
 
 ABC_NAMESPACE_HEADER_END
 #endif

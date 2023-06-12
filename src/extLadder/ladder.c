@@ -36,7 +36,8 @@ void ladderSizeInc(LadderSize_t * ls, int cubeSize, int litSize) {
     if(m[6][4]) { ls->ladder64++; }
 }
 
-void ladderSizePrint(LadderSize_t * ls, int objSize) {
+void ladderSizePrint(LadderSize_t * ls, int objSize, int fVeryVerbose) {
+    if(fVeryVerbose) {
     printf("ladder size stats:\n");
     printf("    ladder24 %.2f%%\n", 100* ls->ladder24/(double)objSize);
     printf("    ladder42 %.2f%%\n", 100* ls->ladder42/(double)objSize);
@@ -50,6 +51,23 @@ void ladderSizePrint(LadderSize_t * ls, int objSize) {
     printf("    ladder63 %.2f%%\n", 100* ls->ladder63/(double)objSize);
     printf("    ladder54 %.2f%%\n", 100* ls->ladder54/(double)objSize);
     printf("    ladder64 %.2f%%\n", 100* ls->ladder64/(double)objSize);
+    }
+    /**
+    FILE * fp = fopen("laddersize.csv", "a");
+    fprintf(fp, "%.2f%%,", 100* ls->ladder24/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder42/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder33/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder52/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder34/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder43/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder62/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder53/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder44/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder63/(double)objSize);
+    fprintf(fp, "%.2f%%,", 100* ls->ladder54/(double)objSize);
+    fprintf(fp, "%.2f%%\n", 100* ls->ladder64/(double)objSize);
+    fclose(fp);
+    */
 }
 
 ABC_NAMESPACE_IMPL_END
